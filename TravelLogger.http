@@ -1,0 +1,105 @@
+@baseUrl = http://localhost:5000
+# Note: Use http instead of https for testing
+
+### Get all cities
+GET {{baseUrl}}/api/cities
+
+### Get city by ID
+GET {{baseUrl}}/api/cities/1
+
+### Register a new user
+POST {{baseUrl}}/api/users
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "description": "Digital nomad exploring the world",
+  "imageUrl": "https://randomuser.me/api/portraits/men/10.jpg",
+  "currentCityId": 1
+}
+
+### Sign in a user by email
+GET {{baseUrl}}/api/users/signin/test@example.com
+
+### Get user profile
+GET {{baseUrl}}/api/users/1
+
+### Update user profile
+PUT {{baseUrl}}/api/users/1
+Content-Type: application/json
+
+{
+  "description": "Updated description",
+  "imageUrl": "https://randomuser.me/api/portraits/men/11.jpg",
+  "currentCityId": 2
+}
+
+### List users by city
+GET {{baseUrl}}/api/cities/1/users
+
+### Create a new log
+POST {{baseUrl}}/api/logs?userId=1
+Content-Type: application/json
+
+{
+  "cityId": 3,
+  "comment": "Great city for digital nomads with fast internet"
+}
+
+### Update a log
+PUT {{baseUrl}}/api/logs/1?userId=1
+Content-Type: application/json
+
+{
+  "cityId": 3,
+  "comment": "Updated comment about this city"
+}
+
+### Delete a log
+DELETE {{baseUrl}}/api/logs/1?userId=1
+
+### List logs by user
+GET {{baseUrl}}/api/users/1/logs
+
+### List logs by city
+GET {{baseUrl}}/api/cities/1/logs
+
+### Create a new recommendation
+POST {{baseUrl}}/api/recommendations?userId=1
+Content-Type: application/json
+
+{
+  "cityId": 3,
+  "name": "Awesome Coworking Space",
+  "description": "Great place to work with fast internet",
+  "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c"
+}
+
+### Update a recommendation
+PUT {{baseUrl}}/api/recommendations/1?userId=1
+Content-Type: application/json
+
+{
+  "cityId": 3,
+  "name": "Updated Coworking Space",
+  "description": "Updated description",
+  "imageUrl": "https://images.unsplash.com/photo-1497366216548-37526070297c"
+}
+
+### Delete a recommendation
+DELETE {{baseUrl}}/api/recommendations/1?userId=1
+
+### List recommendations by city
+GET {{baseUrl}}/api/cities/1/recommendations
+
+### Get recommendation details
+GET {{baseUrl}}/api/recommendations/1?userId=1
+
+### Add an upvote to a recommendation
+POST {{baseUrl}}/api/upvotes?userId=1&recommendationId=2
+
+### Remove an upvote by ID
+DELETE {{baseUrl}}/api/upvotes/1?userId=1
+
+### Remove an upvote by user and recommendation
+DELETE {{baseUrl}}/api/upvotes?userId=1&recommendationId=2
