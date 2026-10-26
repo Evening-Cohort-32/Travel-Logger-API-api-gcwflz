@@ -1,16 +1,6 @@
 # Travel Logger - Digital Nomad Travel Logging Site (.NET 10)
 
-This branch is identical to `main` except for the .NET version it targets, a compile fix, and one added setup step. Use this branch if your cohort is running .NET 10 instead of .NET 8.
-
-## What's different from `main`
-- `TravelLogger.csproj`: `TargetFramework` is `net10.0` (was `net8.0`), and the packages are updated to match: `Microsoft.EntityFrameworkCore.Design` is `10.0.12` (was `8.0`; pinned to this patch because `10.0` resolves to `10.0.0`, which pulls in a package with a known vulnerability), `Npgsql.EntityFrameworkCore.PostgreSQL` is `10.0` (was `8.0`), `Swashbuckle.AspNetCore` is `10.2.3` (was `6.4.0`), and `Microsoft.AspNetCore.OpenApi` is `10.0.10` (was `8.0.4`).
-- `TravelLoggerDbContext.cs`: the `using TravelLogger.Models;` line is removed, because the template has no `Models` namespace yet and the line stopped the project from compiling. Add it back once you create your `Models` folder.
-- `Program.cs`: adds `using TravelLogger;` so `Program.cs` can find `TravelLoggerDbContext`.
-- `README.md`: Getting Started step 3 now runs `dotnet restore` before the `dotnet ef` commands.
-
-Everything else (the rest of the setup steps and the API endpoints below) is unchanged.
-
-A .NET CRUD API for digital nomads to log their travels, share recommendations, and connect with other travelers.
+This branch is identical to `main` except for the .NET version it targets. Use this branch if your cohort is running .NET 10 instead of .NET 8.
 
 ## Project Overview
 
