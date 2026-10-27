@@ -105,6 +105,11 @@ app.MapGet("/api/cities/{id}", (TravelLoggerDbContext db, int id) =>
     return Results.Ok(city);
 });
 
-
+app.MapPost("/api/users", (TravelLoggerDbContext db, User newUser) =>
+{
+    db.Users.Add(newUser);
+    db.SaveChanges();
+    return Results.Created($"/api/users/{newUser.Id}", newUser);
+});
 
 app.Run();
