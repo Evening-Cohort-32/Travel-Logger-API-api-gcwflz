@@ -37,6 +37,40 @@ app.UseCors(options =>
 
 // Add all endpoints here
 
+app.MapGet("/api/cities/{cityId}/recommendations", (TravelLoggerDbContext db, int cityId) =>
+{
+    return db.Recommendations
+        .Where(r => r.CityId == cityId)
+        .Select(r => new RecommendationDTO
+        {
+            Id = r.Id,
+            UserId = r.UserId,
+            CityId = r.CityId,
+            PlaceName = r.PlaceName,
+            Description = r.Description
+        }).ToList();
+});
+
+app.MapGet("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
+{
+    RecommendationDTO? recommendation = db.Recommendations
+        .Where(r => r.Id == id)
+        .Select(r => new RecommendationDTO
+        {
+            Id = r.Id,
+            UserId = r.UserId,
+            CityId = r.CityId,
+            PlaceName = r.PlaceName,
+            Description = r.Description
+        }).SingleOrDefault();
+
+    if (recommendation == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(recommendation);
+});
+
 app.MapGet("/api/cities", (TravelLoggerDbContext db) =>
 {
     return db.Cities
