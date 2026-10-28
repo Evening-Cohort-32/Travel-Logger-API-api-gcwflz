@@ -139,6 +139,58 @@ app.MapGet("/api/cities/{id}", (TravelLoggerDbContext db, int id) =>
     return Results.Ok(city);
 });
 
+
+app.MapGet("/api/users/{userId}/logs", (TravelLoggerDbContext db, int userId)=>
+{
+
+    if(db.Users.SingleOrDefault(u=> u.Id == userId)==null)
+    {
+        return Results.NotFound();
+    }
+   return Results.Ok(
+
+    db.Logs
+   .Include(l=> l.User)
+   .Where(l=> l.UserId == userId)
+   .Select(l=> new LogDTO
+   {
+       Id = l.Id,
+       CityId = l.CityId,
+       UserId = l.UserId,
+       User = new User
+        {
+            Id = l.User.Id,
+            Name = l.User.Name,
+            Email = l.User.Email,
+            Description = l.User.Description,
+            ImageUrl = l.User.ImageUrl
+        },
+       Comments = l.Comments,
+       LoggedAt = l.LoggedAt
+   })     
+   );
+});
+
+app.MapGet("/api/cities/{cityId}/logs", (TravelLoggerDbContext db, int cityId) =>
+{
+    if(db.Cities.SingleOrDefault(c=> c.Id == cityId) == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(
+        db.Logs
+        .Where(l => l.CityId == cityId)
+        .Select(l => new LogDTO
+        {
+            Id = l.Id,
+            CityId = l.CityId,
+            UserId = l.UserId,
+            Comments = l.Comments,
+            LoggedAt = l.LoggedAt
+        })
+    );
+});
+
 app.MapPost("/api/users", (TravelLoggerDbContext db, User newUser) =>
 {
     db.Users.Add(newUser);
