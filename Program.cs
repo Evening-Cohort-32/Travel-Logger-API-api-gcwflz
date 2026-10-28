@@ -106,4 +106,23 @@ app.MapGet("/api/cities/{id}", (TravelLoggerDbContext db, int id) =>
 });
 
 
+app.MapGet("/api/users/{id}", (TravelLoggerDbContext db, int id)=>
+{
+   User UserToReturn = db.Users.SingleOrDefault(u=> u.Id == id);
+   if(UserToReturn == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(new UserDTO
+    {
+        Id = UserToReturn.Id,
+        Name = UserToReturn.Name,
+        Email = UserToReturn.Email,
+        Description = UserToReturn.Description,
+        ImageUrl = UserToReturn.ImageUrl
+    });
+});
+
+
+
 app.Run();
