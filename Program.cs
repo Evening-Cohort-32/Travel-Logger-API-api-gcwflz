@@ -106,5 +106,4 @@ app.MapGet("/api/cities/{id}", (TravelLoggerDbContext db, int id) =>
 });
 
 
-
 app.Run();
