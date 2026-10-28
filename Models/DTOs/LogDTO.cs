@@ -7,4 +7,5 @@ public class LogDTO
     public int CityId { get; set; }
     public string Comments { get; set; }
     public DateTime LoggedAt { get; set; }
+    public User User {get; set;}
 }
