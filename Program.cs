@@ -117,7 +117,7 @@ app.MapGet("/api/users/{userId}/logs", (TravelLoggerDbContext db, int userId)=>
 
     db.Logs
    .Include(l=> l.User)
-   .Where(l=> l.Id == userId)
+   .Where(l=> l.UserId == userId)
    .Select(l=> new LogDTO
    {
        Id = l.Id,
@@ -145,6 +145,7 @@ app.MapGet("/api/cities/{cityId}/logs", (TravelLoggerDbContext db, int cityId) =
     }
     return Results.Ok(
         db.Logs
+        .Where(l => l.CityId == cityId)
         .Select(l => new LogDTO
         {
             Id = l.Id,
@@ -156,5 +157,11 @@ app.MapGet("/api/cities/{cityId}/logs", (TravelLoggerDbContext db, int cityId) =
     );
 });
 
+app.MapPost("/api/users", (TravelLoggerDbContext db, User newUser) =>
+{
+    db.Users.Add(newUser);
+    db.SaveChanges();
+    return Results.Created($"/api/users/{newUser.Id}", newUser);
+});
 
 app.Run();
