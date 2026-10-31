@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http.Json;
 using TravelLogger.Models.DTOs;
 using TravelLogger;
 using TravelLogger.Models;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -69,6 +70,46 @@ app.MapGet("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
         return Results.NotFound();
     }
     return Results.Ok(recommendation);
+});
+
+app.MapPost("/api/recommendations", (TravelLoggerDbContext db, Recommendation newRecommendation) =>
+{
+    db.Recommendations.Add(newRecommendation);
+    db.SaveChanges();
+    return Results.Created($"/api/recommendations/{newRecommendation.Id}", newRecommendation);
+});
+
+app.MapPut("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, Recommendation updatedRecommendation) =>
+{
+    Recommendation? recommendation = db.Recommendations
+    .SingleOrDefault(r => r.Id == id);
+
+    if (recommendation == null)
+    {
+        return Results.NotFound();
+    }
+    recommendation.PlaceName = updatedRecommendation.PlaceName;
+    recommendation.Description = updatedRecommendation.Description;
+
+    db.SaveChanges();
+
+    return Results.Ok(recommendation);
+
+});
+
+app.MapDelete("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
+{
+    Recommendation? recommendation = db.Recommendations
+    .SingleOrDefault(r => r.Id == id);
+
+    if (recommendation == null)
+    {
+        return Results.NotFound();
+    }
+    db.Recommendations.Remove(recommendation);
+    db.SaveChanges();
+
+    return Results.NoContent();
 });
 
 app.MapGet("/api/cities", (TravelLoggerDbContext db) =>
@@ -140,24 +181,24 @@ app.MapGet("/api/cities/{id}", (TravelLoggerDbContext db, int id) =>
 });
 
 
-app.MapGet("/api/users/{userId}/logs", (TravelLoggerDbContext db, int userId)=>
+app.MapGet("/api/users/{userId}/logs", (TravelLoggerDbContext db, int userId) =>
 {
 
-    if(db.Users.SingleOrDefault(u=> u.Id == userId)==null)
+    if (db.Users.SingleOrDefault(u => u.Id == userId) == null)
     {
         return Results.NotFound();
     }
-   return Results.Ok(
+    return Results.Ok(
 
-    db.Logs
-   .Include(l=> l.User)
-   .Where(l=> l.UserId == userId)
-   .Select(l=> new LogDTO
-   {
-       Id = l.Id,
-       CityId = l.CityId,
-       UserId = l.UserId,
-       User = new User
+     db.Logs
+    .Include(l => l.User)
+    .Where(l => l.UserId == userId)
+    .Select(l => new LogDTO
+    {
+        Id = l.Id,
+        CityId = l.CityId,
+        UserId = l.UserId,
+        User = new User
         {
             Id = l.User.Id,
             Name = l.User.Name,
@@ -165,15 +206,15 @@ app.MapGet("/api/users/{userId}/logs", (TravelLoggerDbContext db, int userId)=>
             Description = l.User.Description,
             ImageUrl = l.User.ImageUrl
         },
-       Comments = l.Comments,
-       LoggedAt = l.LoggedAt
-   })     
-   );
+        Comments = l.Comments,
+        LoggedAt = l.LoggedAt
+    })
+    );
 });
 
 app.MapGet("/api/cities/{cityId}/logs", (TravelLoggerDbContext db, int cityId) =>
 {
-    if(db.Cities.SingleOrDefault(c=> c.Id == cityId) == null)
+    if (db.Cities.SingleOrDefault(c => c.Id == cityId) == null)
     {
         return Results.NotFound();
     }
