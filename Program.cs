@@ -255,6 +255,7 @@ app.MapDelete("/api/upVotes/{id}", (int id, TravelLoggerDbContext db) =>
     } 
 
     db.Upvotes.Remove(upvoteToDelete);
+    db.SaveChanges();
     return Results.NoContent();
 });
 
