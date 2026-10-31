@@ -205,4 +205,16 @@ app.MapPost("/api/upVotes", (TravelLoggerDbContext db, Upvote upvote) =>
    return Results.Created($"/api/upvotes/{upvote.Id}", upvote); 
 });
 
+app.MapDelete("/api/upVotes/{id}", (int id, TravelLoggerDbContext db) =>
+{
+   Upvote upvoteToDelete = db.Upvotes.SingleOrDefault(uv=> uv.Id == id);
+   if(upvoteToDelete == null)
+    {
+        return Results.BadRequest();
+    } 
+
+    db.Upvotes.Remove(upvoteToDelete);
+    return Results.NoContent();
+});
+
 app.Run();
