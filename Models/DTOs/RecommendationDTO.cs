@@ -7,5 +7,5 @@ public class RecommendationDTO
     public int CityId { get; set; }
     public string PlaceName { get; set; }
     public string Description { get; set; }
-
+    public int TotalUpvotes { get; set; }
 }

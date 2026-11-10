@@ -69,6 +69,10 @@ app.MapGet("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
     {
         return Results.NotFound();
     }
+
+    recommendation.TotalUpvotes = db.Upvotes
+        .Where(u => u.RecommendationId == id)
+        .Count();
     return Results.Ok(recommendation);
 });
 
