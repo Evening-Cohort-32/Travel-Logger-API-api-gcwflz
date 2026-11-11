@@ -79,7 +79,7 @@ app.MapPost("/api/recommendations", (TravelLoggerDbContext db, Recommendation ne
     return Results.Created($"/api/recommendations/{newRecommendation.Id}", newRecommendation);
 });
 
-app.MapPut("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, Recommendation updatedRecommendation) =>
+app.MapPut("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, int userId, Recommendation updatedRecommendation) =>
 {
     Recommendation? recommendation = db.Recommendations
     .SingleOrDefault(r => r.Id == id);
@@ -87,6 +87,10 @@ app.MapPut("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, Recom
     if (recommendation == null)
     {
         return Results.NotFound();
+    }
+    if (recommendation.UserId != userId)
+    {
+        return Results.StatusCode(403);
     }
     recommendation.PlaceName = updatedRecommendation.PlaceName;
     recommendation.Description = updatedRecommendation.Description;
@@ -97,7 +101,7 @@ app.MapPut("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, Recom
 
 });
 
-app.MapDelete("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
+app.MapDelete("/api/recommendations/{id}", (TravelLoggerDbContext db, int id, int userId) =>
 {
     Recommendation? recommendation = db.Recommendations
     .SingleOrDefault(r => r.Id == id);
@@ -105,6 +109,10 @@ app.MapDelete("/api/recommendations/{id}", (TravelLoggerDbContext db, int id) =>
     if (recommendation == null)
     {
         return Results.NotFound();
+    }
+    if (recommendation.UserId != userId)
+    {
+        return Results.StatusCode(403);
     }
     db.Recommendations.Remove(recommendation);
     db.SaveChanges();
@@ -234,9 +242,48 @@ app.MapGet("/api/cities/{cityId}/logs", (TravelLoggerDbContext db, int cityId) =
 
 app.MapPost("/api/users", (TravelLoggerDbContext db, User newUser) =>
 {
+    if (db.Users.Any(u => u.Email == newUser.Email))
+    {
+        return Results.BadRequest("Email is already being used");
+    }
     db.Users.Add(newUser);
     db.SaveChanges();
     return Results.Created($"/api/users/{newUser.Id}", newUser);
+});
+
+app.MapPut("/api/users/{id}", (TravelLoggerDbContext db, int id, int userId, User user) =>
+{
+    if (id != userId)
+    {
+        return Results.StatusCode(403);
+    }
+    User? userToUpdate = db.Users.SingleOrDefault(u => u.Id == id);
+    if (userToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    userToUpdate.Name = user.Name;
+    userToUpdate.Description = user.Description;
+    userToUpdate.ImageUrl = user.ImageUrl;
+    db.SaveChanges
+    return Results.NoContent();
+});
+
+app.MapGet("/api/users/signin/{email}", (TravelLoggerDbContext db, string email) =>
+{
+    User? user = db.Users.SingleOrDefault(u => u.Email == email);
+    if (user == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(new UserDTO
+    {
+        Id = user.Id,
+        Name = user.Name,
+        Email = user.Email,
+        Description = user.Description,
+        ImageUrl = user.ImageUrl
+    });
 });
 
 app.MapPost("/api/upVotes", (TravelLoggerDbContext db, Upvote upvote) =>
@@ -246,14 +293,17 @@ app.MapPost("/api/upVotes", (TravelLoggerDbContext db, Upvote upvote) =>
     return Results.Created($"/api/upvotes/{upvote.Id}", upvote);
 });
 
-app.MapDelete("/api/upVotes/{id}", (int id, TravelLoggerDbContext db) =>
+app.MapDelete("/api/upVotes/{id}", (int id, int userId, TravelLoggerDbContext db) =>
 {
     Upvote? upvoteToDelete = db.Upvotes.SingleOrDefault(uv => uv.Id == id);
     if (upvoteToDelete == null)
     {
         return Results.BadRequest();
     }
-
+    if (upvoteToDelete.UserId != userId)
+    {
+        return Results.StatusCode(403);
+    }
     db.Upvotes.Remove(upvoteToDelete);
     db.SaveChanges();
     return Results.NoContent();
@@ -266,7 +316,7 @@ app.MapPost("/api/logs", (TravelLoggerDbContext db, Log newLog) =>
     return Results.Created($"/api/logs/{newLog.Id}", newLog);
 });
 
-app.MapPut("/api/logs/{id}", (TravelLoggerDbContext db, int id, Log updatedLog) =>
+app.MapPut("/api/logs/{id}", (TravelLoggerDbContext db, int id, int userId, Log updatedLog) =>
 {
     Log? log = db.Logs
     .SingleOrDefault(l => l.Id == id);
@@ -274,6 +324,10 @@ app.MapPut("/api/logs/{id}", (TravelLoggerDbContext db, int id, Log updatedLog) 
     if (log == null)
     {
         return Results.NotFound();
+    }
+    if (log.UserId != userId)
+    {
+        return Results.StatusCode(403);
     }
 
     log.Comments = updatedLog.Comments;
@@ -284,7 +338,7 @@ app.MapPut("/api/logs/{id}", (TravelLoggerDbContext db, int id, Log updatedLog) 
     return Results.Ok(log);
 });
 
-app.MapDelete("/api/logs/{id}", (TravelLoggerDbContext db, int id) =>
+app.MapDelete("/api/logs/{id}", (TravelLoggerDbContext db, int id, int userId) =>
 {
     Log? log = db.Logs
     .SingleOrDefault(l => l.Id == id);
@@ -293,7 +347,10 @@ app.MapDelete("/api/logs/{id}", (TravelLoggerDbContext db, int id) =>
     {
         return Results.NotFound();
     }
-
+    if (log.UserId != userId)
+    {
+        return Results.StatusCode(403);
+    }
     db.Logs.Remove(log);
     db.SaveChanges();
 
